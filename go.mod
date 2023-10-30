@@ -2,7 +2,10 @@ module github.com/jo-pouradier/goGame
 
 go 1.21.3
 
-require github.com/hajimehoshi/ebiten/v2 v2.6.2
+require (
+	github.com/hajimehoshi/ebiten/v2 v2.6.2
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
+)
 
 require (
 	github.com/ebitengine/purego v0.5.0 // indirect

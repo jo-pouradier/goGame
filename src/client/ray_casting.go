@@ -15,7 +15,6 @@
 package main
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"image"
@@ -23,20 +22,22 @@ import (
 	_ "image/png"
 	"log"
 	"math"
+	"os"
 	"sort"
+
+	"github.com/nfnt/resize"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/examples/resources/images"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 const (
-	screenHeight = 240
-	screenWidth  = 240
+	screenWidth  = 300
+	screenHeight = screenWidth * 13/16
 	padding      = 20
-	userSpeed = 3
+	userSpeed    = 3
 )
 
 var (
@@ -46,13 +47,21 @@ var (
 )
 
 func init() {
-	// Decode an image from the image file's byte slice.
-	img, _, err := image.Decode(bytes.NewReader(images.Tile_png))
+	f, err := os.Open("./src/assets/jawbreaker_sample.png")
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer f.Close()
+
+	// Load the image and resize it to fit the screen
+	img, _, err := image.Decode(f)
+	if err != nil {
+		log.Fatal(err)
+	}
+	img = resize.Resize(screenWidth-padding*2, screenHeight-padding*2, img, resize.Lanczos3)
+
+	// Create the background image
 	bgImage = ebiten.NewImageFromImage(img)
-	triangleImage.Fill(color.White)
 }
 
 type line struct {
@@ -245,7 +254,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	// Draw background
-	screen.DrawImage(bgImage, nil)
+	opt_backgroud := &ebiten.DrawImageOptions{}
+	opt_backgroud.GeoM.Translate(padding, padding)
+	screen.DrawImage(bgImage, opt_backgroud)
 
 	if g.showRays {
 		// Draw rays
